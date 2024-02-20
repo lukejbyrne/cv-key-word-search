@@ -1,4 +1,84 @@
 # Adjusting the script to analyze top keywords and technologies per generic job title
+# Importing necessary libraries for web scraping and text analysis
+import requests
+from bs4 import BeautifulSoup
+from collections import Counter
+import re
+
+# TODO: update to add NLP to detect tech words and generic job title
+
+# List of job URLs to scrape
+job_urls = [
+    "https://ai-jobs.net/job/110166-machine-learning-engineer-ai-pipeline-latm-emea-remote/",
+    "https://ai-jobs.net/job/125851-data-scientist-machine-learning/",
+    "https://ai-jobs.net/job/120148-machine-learning-engineer/",
+    "https://ai-jobs.net/job/119603-machine-learning-engineer-ii/",
+    "https://ai-jobs.net/job/119362-machine-learning-engineer-mid-level/",
+    "https://ai-jobs.net/job/115583-machine-learning-engineer/",
+    "https://ai-jobs.net/job/111946-machine-learning-systems-engineer-ads-ml-platform/",
+    "https://ai-jobs.net/job/110166-machine-learning-engineer-ai-pipeline-latm-emea-remote/",
+    "https://ai-jobs.net/job/135287-machine-learning-engineer-europe-and-uk/",
+    "https://ai-jobs.net/job/131808-machine-learning-operations-engineer/",
+    "https://ai-jobs.net/job/131181-machine-learning-platform-operations-engineer/",
+    "https://ai-jobs.net/job/137475-ai-engineer/",
+    "https://ai-jobs.net/job/136746-ai-research-scientist-generative-ai-and-multi-party-computation-mpc/",
+    "https://ai-jobs.net/job/135287-machine-learning-engineer-europe-and-uk/",
+    "https://ai-jobs.net/job/134255-data-scientist/",
+    "https://ai-jobs.net/job/133715-ai-research-engineer/",
+    "https://ai-jobs.net/job/128374-data-scientist-privacy-hub-uk/",
+    "https://ai-jobs.net/job/125851-data-scientist-machine-learning/",
+    "https://ai-jobs.net/job/126048-data-scientist-optimization/",
+    "https://ai-jobs.net/job/126268-machine-learning-engineer-ops/",
+    "https://ai-jobs.net/job/124279-data-scientist-aws-generative-ai-innovation-center-proserve-genai-open-reqs/",
+    "https://ai-jobs.net/job/123566-middle-machine-learning-engineer-neurolinguistic-research/",
+    "https://ai-jobs.net/job/121586-data-scientist-payment-success/",
+    "https://ai-jobs.net/job/121678-engineering-manager-aiml/",
+    "https://ai-jobs.net/job/118706-data-scientist-juniormid-level/",
+    "https://ai-jobs.net/job/117046-data-scientist/",
+    "https://ai-jobs.net/job/111183-data-scientist/",
+    "https://ai-jobs.net/job/128715-machine-learning-scientist-ii/"
+]
+
+# Function to scrape and process job listings to extract keywords and technologies
+def scrape_and_analyze_job_listings(job_urls):
+    # Lists to hold all the keywords and technologies from all job listings
+    all_keywords = []
+    all_technologies = []
+
+    # Predefined list of common technologies for filtering
+    technology_terms = ['Python', 'TensorFlow', 'PyTorch', 'Keras', 'Scikit-learn', 'Pandas', 'Numpy', 'SQL', 'Hadoop', 'Spark', 'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP', 'Git', 'Linux', 'Java', 'C++', 'R', 'Matlab']
+
+    # Iterate through the list of URLs and scrape content
+    for url in job_urls:
+        response = requests.get(url)
+        if response.status_code == 200:  # Check if the response is successful
+            soup = BeautifulSoup(response.text, 'html.parser')
+            # Extract text content; here assuming main job description is within 'p' tags
+            text_content = ' '.join([p.text for p in soup.find_all('p')])
+            # Normalize the text to lower case for uniformity
+            text_content = text_content.lower()
+            # Extract words as potential keywords (excluding too common words and single characters)
+            words = re.findall(r'\b[a-z]{2,}\b', text_content)  # Extract words with 2 or more characters
+            all_keywords.extend(words)
+            # Extract technologies based on predefined technology list (case insensitive)
+            technologies_found = [tech for tech in technology_terms if tech.lower() in text_content]
+            all_technologies.extend(technologies_found)
+
+    # Count the occurrences of each keyword and technology
+    keyword_counts = Counter(all_keywords)
+    technology_counts = Counter(all_technologies)
+
+    # Extract the top 10 keywords and technologies
+    top_keywords = keyword_counts.most_common(10)
+    top_technologies = technology_counts.most_common(10)
+
+    # Return the results
+    return top_keywords, top_technologies
+
+# Note: Actual function call will be uncommented after review
+# top_keywords, top_technologies = scrape_and_analyze_job_listings(job_urls)
+# print("Top 10 Keywords:", top_keywords)
+# print("Top 10 Technologies:", top_technologies)
 
 # Importing necessary libraries for web scraping and text analysis
 import requests
